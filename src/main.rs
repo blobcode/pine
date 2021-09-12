@@ -4,6 +4,10 @@ use serde_derive::Deserialize;
 use std::fs;
 use std::net::SocketAddr;
 
+// logging crates
+use fern::colors::{Color, ColoredLevelConfig};
+use log::{error, info};
+
 // config structs
 #[derive(Debug, Deserialize)]
 struct Config {
@@ -19,12 +23,36 @@ struct HostConfig {
     to: String,
 }
 
+fn setup_logger() -> Result<(), fern::InitError> {
+    let colors = ColoredLevelConfig::new()
+        .debug(Color::Magenta)
+        .info(Color::BrightBlue)
+        .error(Color::BrightRed);
+
+    fern::Dispatch::new()
+        .chain(std::io::stdout())
+        .format(move |out, message, record| {
+            out.finish(format_args!(
+                "[{}] {}",
+                // This will color the log level only, not the whole line. Just a touch.
+                colors.color(record.level()),
+                message
+            ))
+        })
+        .apply()
+        .unwrap();
+    Ok(())
+}
+
 // main loop
 #[tokio::main]
 async fn main() {
     // load config
     let confile = fs::read_to_string("./config.toml").expect("Unable to read config file");
     let decoded: Config = toml::from_str(&confile).unwrap();
+
+    // Configure logger at runtime
+    setup_logger().map_err(|err| error!("{}", err)).ok();
 
     // set server address
     let port = decoded.port.unwrap();
@@ -42,12 +70,13 @@ async fn main() {
         async move {
             // Request handler
             Ok::<_, Error>(service_fn(move |mut req| {
-                let mut toaddr = "localhost:3000";
+                let mut toaddr = "";
                 let headers = req.headers();
                 // check for host matches in the config file
                 for host in &decoded.hosts {
                     if host.from == headers["host"] {
                         toaddr = &host.to;
+                        info!("request to {}{} sent to {}", host.from, req.uri(), &host.to)
                     }
                 }
                 // format new uri
@@ -68,10 +97,10 @@ async fn main() {
     });
     // start server
     let server = Server::bind(&addr).serve(make_service);
-    println!("server listening on http://{}", addr);
+    info!("server listening on http://{}", addr);
 
     // error handling
-    if let Err(e) = server.await {
-        eprintln!("server error: {}", e);
+    if let Err(err) = server.await {
+        error!("{}", err);
     }
 }
