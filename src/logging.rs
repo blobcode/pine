@@ -5,8 +5,18 @@ fn log(logtype: &str, style: yansi::Style, content: &str) {
   println!("[{}] {}", style.paint(logtype), content);
 }
 
-pub fn info(input: &str) {
-  log("info", Style::new(Color::Cyan), input)
+// logs info to screen
+pub fn info(input: String) {
+  log("info", Style::new(Color::Cyan), &input)
 }
 
-pub fn logrequest() {}
+// only compiles on debug builds, not in --release
+#[cfg(debug_assertions)]
+pub fn debug(input: &str) {
+  log("debug", Style::new(Color::Magenta), &input)
+}
+
+#[cfg(not(debug_assertions))]
+pub fn debug(input: &str) {
+  return
+}

@@ -8,7 +8,7 @@ use std::net::SocketAddr;
 // import
 mod logging;
 
-pub use crate::logging::info;
+pub use crate::logging::{info, debug};
 
 // config structs
 #[derive(Debug, Deserialize)]
@@ -25,8 +25,8 @@ struct HostConfig {
     to: String,
 }
 
-async fn handler(_: Request<Body>) -> Result<Response<Body>, Infallible> {
-    Ok(Response::new(Body::from("Hello World!")))
+async fn handler(_: Request<Body>) -> Result<Request<Body>, Infallible> {
+    Ok(Request::new(Body::from("Hello World!")))
 }
 
 // main loop
@@ -35,7 +35,6 @@ async fn main() {
     // load config
     let confile = fs::read_to_string("./config.toml").expect("Unable to read config file");
     let decoded: Config = toml::from_str(&confile).unwrap();
-    info("test");
     // set server address
     let port = decoded.port.unwrap();
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
@@ -58,7 +57,7 @@ async fn main() {
                 for host in &decoded.hosts {
                     if host.from == headers["host"] {
                         toaddr = &host.to;
-                        println!("request to {}{} sent to {}", host.from, req.uri(), &host.to)
+                        info(format!("request to {}{} sent to {}", host.from, req.uri(), &host.to))
                     }
                 }
                 // format new uri
@@ -79,8 +78,8 @@ async fn main() {
     });
     // start server
     let server = Server::bind(&addr).serve(make_service);
-    println!("server listening on http://{}", addr);
-
+    info(format!("server listening on http://{}", addr));
+    debug("running in debug");
     // error handling
     if let Err(err) = server.await {
         panic!("{}", err);
