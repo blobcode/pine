@@ -1,12 +1,14 @@
 use hyper::service::{make_service_fn, service_fn};
-use hyper::{Client, Error, Server};
+use hyper::{Body, Client, Error, Request, Response, Server};
 use serde_derive::Deserialize;
+use std::convert::Infallible;
 use std::fs;
 use std::net::SocketAddr;
 
-// logging crates
-use fern::colors::{Color, ColoredLevelConfig};
-use log::{error, info};
+// import
+mod logging;
+
+pub use crate::logging::info;
 
 // config structs
 #[derive(Debug, Deserialize)]
@@ -23,25 +25,8 @@ struct HostConfig {
     to: String,
 }
 
-fn setup_logger() -> Result<(), fern::InitError> {
-    let colors = ColoredLevelConfig::new()
-        .debug(Color::Magenta)
-        .info(Color::BrightBlue)
-        .error(Color::BrightRed);
-
-    fern::Dispatch::new()
-        .chain(std::io::stdout())
-        .format(move |out, message, record| {
-            out.finish(format_args!(
-                "[{}] {}",
-                // This will color the log level only, not the whole line. Just a touch.
-                colors.color(record.level()),
-                message
-            ))
-        })
-        .apply()
-        .unwrap();
-    Ok(())
+async fn handler(_: Request<Body>) -> Result<Response<Body>, Infallible> {
+    Ok(Response::new(Body::from("Hello World!")))
 }
 
 // main loop
@@ -50,10 +35,7 @@ async fn main() {
     // load config
     let confile = fs::read_to_string("./config.toml").expect("Unable to read config file");
     let decoded: Config = toml::from_str(&confile).unwrap();
-
-    // Configure logger at runtime
-    setup_logger().map_err(|err| error!("{}", err)).ok();
-
+    info("test");
     // set server address
     let port = decoded.port.unwrap();
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
@@ -76,7 +58,7 @@ async fn main() {
                 for host in &decoded.hosts {
                     if host.from == headers["host"] {
                         toaddr = &host.to;
-                        info!("request to {}{} sent to {}", host.from, req.uri(), &host.to)
+                        println!("request to {}{} sent to {}", host.from, req.uri(), &host.to)
                     }
                 }
                 // format new uri
@@ -97,10 +79,10 @@ async fn main() {
     });
     // start server
     let server = Server::bind(&addr).serve(make_service);
-    info!("server listening on http://{}", addr);
+    println!("server listening on http://{}", addr);
 
     // error handling
     if let Err(err) = server.await {
-        error!("{}", err);
+        panic!("{}", err);
     }
 }
