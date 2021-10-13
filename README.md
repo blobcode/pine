@@ -1,7 +1,5 @@
 # 🌲 pine
 
-## Table of Contents
-
 - [About](#about)
 - [Getting Started](#getting_started)
 - [Usage](#usage)
