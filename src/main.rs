@@ -6,18 +6,17 @@ use std::net::SocketAddr;
 mod config;
 mod logging;
 
-pub use crate::config::{gethosts, readfile};
+pub use crate::config::getconfig;
 pub use crate::logging::{debug, info};
 
 // main event loop
 #[tokio::main]
 async fn main() {
     // load config
-    let config = readfile();
-    // parse hosts from config
-    let hosts = gethosts();
+    let config = getconfig();
     // set server address
-    let port = config.get("config", "port").unwrap();
+    let port = config.port;
+    let hosts = config.hosts;
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
 
     let client_main = Client::new();

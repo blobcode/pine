@@ -2,12 +2,18 @@ extern crate tini;
 use std::collections::HashMap;
 use tini::Ini;
 
-pub fn readfile() -> Ini {
+// main config struct
+pub struct Config {
+    pub port: u16,
+    pub hosts: HashMap<String, String>,
+}
+
+fn readfile() -> Ini {
     let conf = Ini::from_file("./config.ini").unwrap();
     return conf;
 }
 
-pub fn gethosts() -> HashMap<String, String> {
+fn gethosts() -> HashMap<String, String> {
     let config = readfile();
     let hostlist: Vec<String> = config.get_vec("config", "hosts").unwrap();
     let mut hosts = HashMap::new();
@@ -17,4 +23,14 @@ pub fn gethosts() -> HashMap<String, String> {
         hosts.insert(from, to);
     }
     return hosts;
+}
+
+// main function
+pub fn getconfig() -> Config {
+    let conf = readfile();
+    let config = Config {
+        port: conf.get("config", "port").unwrap(),
+        hosts: gethosts(),
+    };
+    return config;
 }
