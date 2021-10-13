@@ -1,29 +1,21 @@
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Client, Error, Server};
-use std::collections::HashMap;
 use std::net::SocketAddr;
 
-// import
+// imports
 mod config;
 mod logging;
 
-pub use crate::config::readfile;
+pub use crate::config::{readfile,gethosts};
 pub use crate::logging::{debug, info};
 
-// main loop
+// main event loop
 #[tokio::main]
 async fn main() {
     // load config
     let config = readfile();
-    // parse hosts
-    let hostlist: Vec<String> = config.get_vec("config", "hosts").unwrap();
-    let mut hosts = HashMap::new();
-    for host in hostlist {
-        let from: String = config.get(&host, "from").unwrap();
-        let to: String = config.get(&host, "to").unwrap();
-
-        hosts.insert(from, to);
-    }
+    // parse hosts from config
+    let hosts = gethosts();
     // set server address
     let port = config.get("config", "port").unwrap();
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
@@ -31,7 +23,8 @@ async fn main() {
     let client_main = Client::new();
 
     // The closure inside `make_service_fn` is run for each connection,
-    // creating a 'service' to handle requests for that specific connection.
+    // creating a 'service' to handle requests for that specific connection, and
+    // will run on EVERY request.
     let make_service = make_service_fn(move |_| {
         // clone vars
         let hosts = hosts.clone();
