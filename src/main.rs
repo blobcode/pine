@@ -1,42 +1,31 @@
 use hyper::service::{make_service_fn, service_fn};
-use hyper::{Body, Client, Error, Request, Response, Server};
-use serde_derive::Deserialize;
-use std::convert::Infallible;
-use std::fs;
+use hyper::{Client, Error, Server};
+use std::collections::HashMap;
 use std::net::SocketAddr;
 
 // import
+mod config;
 mod logging;
 
-pub use crate::logging::{info, debug};
-
-// config structs
-#[derive(Debug, Deserialize)]
-struct Config {
-    port: Option<u16>,
-    #[serde(alias = "host")]
-    hosts: Vec<HostConfig>,
-}
-
-// struct for hosts in the config file
-#[derive(Debug, Deserialize)]
-struct HostConfig {
-    from: String,
-    to: String,
-}
-
-async fn handler(_: Request<Body>) -> Result<Request<Body>, Infallible> {
-    Ok(Request::new(Body::from("Hello World!")))
-}
+pub use crate::config::readfile;
+pub use crate::logging::{debug, info};
 
 // main loop
 #[tokio::main]
 async fn main() {
     // load config
-    let confile = fs::read_to_string("./config.toml").expect("Unable to read config file");
-    let decoded: Config = toml::from_str(&confile).unwrap();
+    let config = readfile();
+    // parse hosts
+    let hostlist: Vec<String> = config.get_vec("config", "hosts").unwrap();
+    let mut hosts = HashMap::new();
+    for host in hostlist {
+        let from: String = config.get(&host, "from").unwrap();
+        let to: String = config.get(&host, "to").unwrap();
+
+        hosts.insert(from, to);
+    }
     // set server address
-    let port = decoded.port.unwrap();
+    let port = config.get("config", "port").unwrap();
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
 
     let client_main = Client::new();
@@ -45,7 +34,7 @@ async fn main() {
     // creating a 'service' to handle requests for that specific connection.
     let make_service = make_service_fn(move |_| {
         // clone vars
-        let decoded: Config = toml::from_str(&confile).unwrap();
+        let hosts = hosts.clone();
         let client = client_main.clone();
 
         async move {
@@ -54,10 +43,15 @@ async fn main() {
                 let mut toaddr = "";
                 let headers = req.headers();
                 // check for host matches in the config file
-                for host in &decoded.hosts {
-                    if host.from == headers["host"] {
-                        toaddr = &host.to;
-                        info(format!("request to {}{} sent to {}", host.from, req.uri(), &host.to))
+                for (from,to) in &hosts {
+                    if from == &headers["host"] {
+                        toaddr = &to;
+                        info(format!(
+                            "request to {}{} sent to {}",
+                            from,
+                            req.uri(),
+                            to,
+                        ))
                     }
                 }
                 // format new uri
