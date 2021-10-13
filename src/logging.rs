@@ -17,6 +17,6 @@ pub fn debug(input: &str) {
 }
 
 #[cfg(not(debug_assertions))]
-pub fn debug(input: &str) {
+pub fn debug(_input: &str) {
   return
 }
