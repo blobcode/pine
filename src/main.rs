@@ -6,7 +6,7 @@ use std::net::SocketAddr;
 mod config;
 mod logging;
 
-pub use crate::config::{readfile,gethosts};
+pub use crate::config::{gethosts, readfile};
 pub use crate::logging::{debug, info};
 
 // main event loop
@@ -36,15 +36,10 @@ async fn main() {
                 let mut toaddr = "";
                 let headers = req.headers();
                 // check for host matches in the config file
-                for (from,to) in &hosts {
+                for (from, to) in &hosts {
                     if from == &headers["host"] {
                         toaddr = &to;
-                        info(format!(
-                            "request to {}{} sent to {}",
-                            from,
-                            req.uri(),
-                            to,
-                        ))
+                        info(format!("request to {}{} sent to {}", from, req.uri(), to,))
                     }
                 }
                 // format new uri

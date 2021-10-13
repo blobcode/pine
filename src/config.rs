@@ -1,14 +1,13 @@
 extern crate tini;
-use tini::Ini;
 use std::collections::HashMap;
+use tini::Ini;
 
-pub fn readfile() -> Ini{
+pub fn readfile() -> Ini {
     let conf = Ini::from_file("./config.ini").unwrap();
     return conf;
 }
 
-
-pub fn gethosts() -> HashMap<String,String>{
+pub fn gethosts() -> HashMap<String, String> {
     let config = readfile();
     let hostlist: Vec<String> = config.get_vec("config", "hosts").unwrap();
     let mut hosts = HashMap::new();
