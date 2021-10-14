@@ -7,7 +7,7 @@ mod config;
 mod logging;
 
 pub use crate::config::getconfig;
-pub use crate::logging::{debug, info};
+pub use crate::logging::{debug, error, info};
 
 // main event loop
 #[tokio::main]
@@ -63,6 +63,6 @@ async fn main() {
     debug("running in debug");
     // error handling
     if let Err(err) = server.await {
-        panic!("{}", err);
+        error(Some(format!("{}", err)));
     }
 }
