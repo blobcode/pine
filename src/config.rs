@@ -5,19 +5,20 @@ use tini::Ini;
 // main config struct
 pub struct Config {
     pub port: u16,
-    pub hosts: HashMap<String, String>,
+    pub hosts: HashMap<Vec<String>, String>,
 }
 
 fn readfile() -> Ini {
     Ini::from_file("./config.ini").unwrap()
 }
 
-fn gethosts() -> HashMap<String, String> {
+fn gethosts() -> HashMap<Vec<String>, String> {
     let config = readfile();
     let hostlist: Vec<String> = config.get_vec("config", "hosts").unwrap();
     let mut hosts = HashMap::new();
     for host in hostlist {
-        let from: String = config.get(&host, "from").unwrap();
+        let input: String = config.get(&host, "from").unwrap();
+        let from = input.split(", ").map(|s| s.to_string()).collect();
         let to: String = config.get(&host, "to").unwrap();
         hosts.insert(from, to);
     }

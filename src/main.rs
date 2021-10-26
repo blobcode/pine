@@ -36,9 +36,16 @@ async fn main() {
                 let headers = req.headers();
                 // check for host matches in the config file
                 for (from, to) in &hosts {
-                    if from == &headers["host"] {
-                        toaddr = to;
-                        info(format!("request to {}{} sent to {}", from, req.uri(), to,))
+                    for fromhost in from {
+                        if fromhost == &headers["host"] {
+                            toaddr = to;
+                            info(format!(
+                                "request to {}{} sent to {}",
+                                fromhost,
+                                req.uri(),
+                                to,
+                            ))
+                        }
                     }
                 }
                 // format new uri
@@ -59,7 +66,7 @@ async fn main() {
     });
     // start server
     let server = Server::bind(&addr).serve(make_service);
-    info(format!("server listening on http://{}", addr));
+    info(format!("server listening on http://localhost:{}", port));
     debug("running in debug");
     // error handling
     if let Err(err) = server.await {
