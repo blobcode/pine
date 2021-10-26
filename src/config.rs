@@ -9,8 +9,7 @@ pub struct Config {
 }
 
 fn readfile() -> Ini {
-    let conf = Ini::from_file("./config.ini").unwrap();
-    return conf;
+    Ini::from_file("./config.ini").unwrap()
 }
 
 fn gethosts() -> HashMap<String, String> {
@@ -22,15 +21,14 @@ fn gethosts() -> HashMap<String, String> {
         let to: String = config.get(&host, "to").unwrap();
         hosts.insert(from, to);
     }
-    return hosts;
+    hosts
 }
 
 // main function
 pub fn getconfig() -> Config {
     let conf = readfile();
-    let config = Config {
+    Config {
         port: conf.get("config", "port").unwrap(),
         hosts: gethosts(),
-    };
-    return config;
+    }
 }

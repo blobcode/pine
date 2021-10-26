@@ -37,7 +37,7 @@ async fn main() {
                 // check for host matches in the config file
                 for (from, to) in &hosts {
                     if from == &headers["host"] {
-                        toaddr = &to;
+                        toaddr = to;
                         info(format!("request to {}{} sent to {}", from, req.uri(), to,))
                     }
                 }
