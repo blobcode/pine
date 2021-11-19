@@ -29,14 +29,15 @@ async fn main() {
         let hosts = hosts.clone();
         let client = client_main.clone();
 
+
         async move {
             // Request handler
             Ok::<_, Error>(service_fn(move |mut req| {
-                let mut toaddr = "";
+                let mut toaddr = " ";
                 let headers = req.headers();
                 // check for host matches in the config file
-                for (from, to) in &hosts {
-                    for fromhost in from {
+                for (hostgroup, to) in &hosts {
+                    for fromhost in hostgroup {
                         if fromhost == &headers["host"] {
                             toaddr = to;
                             info(format!(
@@ -70,6 +71,6 @@ async fn main() {
     debug("running in debug");
     // error handling
     if let Err(err) = server.await {
-        error(Some(format!("{}", err)));
+        error(&format!("{}", err));
     }
 }

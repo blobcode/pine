@@ -10,16 +10,8 @@ pub fn info(input: String) {
     log("info", Style::new(Color::Cyan), &input)
 }
 
-pub fn error(input: Option<String>) {
-    if let Some(payload) = input {
-        log("error", Style::new(Color::Red), &payload)
-    } else {
-        log(
-            "error",
-            Style::new(Color::Red),
-            "an undefined error occured",
-        )
-    }
+pub fn error(input: &str) {
+        log("error", Style::new(Color::Red), &input)
 }
 
 // only compiles on debug builds, not in --release
