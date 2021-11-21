@@ -1,76 +1,73 @@
-use hyper::service::{make_service_fn, service_fn};
-use hyper::{Client, Error, Server};
-use std::net::SocketAddr;
-
 // imports
 mod config;
 mod logging;
+mod server;
 
-pub use crate::config::getconfig;
-pub use crate::logging::{debug, error, info};
+use std::path::Path;
 
-// main event loop
-#[tokio::main]
-async fn main() {
-    // load config
-    let config = getconfig();
-    // set server address
-    let port = config.port;
-    let hosts = config.hosts;
-    let addr = SocketAddr::from(([127, 0, 0, 1], port));
+use crate::logging::{debug, error, info};
 
-    let client_main = Client::new();
+const HELP: &str = r#"                          
+   ___  __ __  ___ 
+  / _ \/ / _ \/ -_)
+ / .__/_/_//_/\__/ 
+/_/
 
-    // The closure inside `make_service_fn` is run for each connection,
-    // creating a 'service' to handle requests for that specific connection, and
-    // will run on EVERY request.
-    let make_service = make_service_fn(move |_| {
-        // clone vars
-        let hosts = hosts.clone();
-        let client = client_main.clone();
+a simple, elegant reverse proxy
 
+usage: 
 
-        async move {
-            // Request handler
-            Ok::<_, Error>(service_fn(move |mut req| {
-                let mut toaddr = " ";
-                let headers = req.headers();
-                // check for host matches in the config file
-                for (hostgroup, to) in &hosts {
-                    for fromhost in hostgroup {
-                        if fromhost == &headers["host"] {
-                            toaddr = to;
-                            info(format!(
-                                "request to {}{} sent to {}",
-                                fromhost,
-                                req.uri(),
-                                to,
-                            ))
-                        }
-                    }
-                }
-                // format new uri
-                let uri_string = format!(
-                    "http://{}{}",
-                    toaddr,
-                    req.uri()
-                        .path_and_query()
-                        .map(|x| x.as_str())
-                        .unwrap_or("/")
-                );
-                // request new url
-                let uri = uri_string.parse().unwrap();
-                *req.uri_mut() = uri;
-                client.request(req)
-            }))
+pine <config file>
+
+"#;
+
+#[derive(Debug)]
+struct AppArgs {
+    configfile: Option<String>,
+}
+
+fn main() {
+    let args = match parse_args() {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("Error: {}.", e);
+            std::process::exit(1);
         }
-    });
-    // start server
-    let server = Server::bind(&addr).serve(make_service);
-    info(format!("server listening on http://localhost:{}", port));
-    debug("running in debug");
-    // error handling
-    if let Err(err) = server.await {
-        error(&format!("{}", err));
+    };
+
+    let conf = config::getconfig(&args.configfile.unwrap());
+
+    info(format!(
+        "server listening on http://localhost:{}",
+        conf.port
+    ));
+    debug("running in debug mode");
+    server::run(conf);
+}
+
+fn parse_args() -> Result<AppArgs, pico_args::Error> {
+    let mut pargs = pico_args::Arguments::from_env();
+
+    // Help has a higher priority and should be handled separately.
+    if pargs.contains(["-h", "--help"]) {
+        print!("{}", HELP);
+        std::process::exit(0);
     }
+
+    let mut args = AppArgs {
+        configfile: pargs.opt_free_from_str()?,
+    };
+
+    // overwrite args if local config.ini file is found in the cwd
+    if Path::new("./config.ini").exists() && args.configfile.is_none() {
+        args.configfile = Some("./config.ini".to_string())
+    }
+    // checking if the config file doesn't exist
+    else if !Path::new(&args.configfile.clone().unwrap()).exists() {
+        error(&format!("{} not found", args.configfile.unwrap()));
+        print!("{}", HELP);
+        std::process::exit(0);
+    }
+
+    Ok(args)
 }

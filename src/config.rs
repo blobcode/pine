@@ -8,12 +8,12 @@ pub struct Config {
     pub hosts: HashMap<Vec<String>, String>,
 }
 
-fn readfile() -> Ini {
-    Ini::from_file("./config.ini").unwrap()
+fn readfile(file: &str) -> Ini {
+    Ini::from_file(file).unwrap()
 }
 
-fn gethosts() -> HashMap<Vec<String>, String> {
-    let config = readfile();
+fn gethosts(file: &str) -> HashMap<Vec<String>, String> {
+    let config = readfile(file);
     let hostlist: Vec<String> = config.get_vec("config", "hosts").unwrap();
     let mut hosts = HashMap::new();
     for host in hostlist {
@@ -26,10 +26,10 @@ fn gethosts() -> HashMap<Vec<String>, String> {
 }
 
 // main function
-pub fn getconfig() -> Config {
-    let conf = readfile();
+pub fn getconfig(file: &str) -> Config {
+    let conf = readfile(file);
     Config {
         port: conf.get("config", "port").unwrap(),
-        hosts: gethosts(),
+        hosts: gethosts(file),
     }
 }
