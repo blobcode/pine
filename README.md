@@ -42,7 +42,7 @@ cargo run --release
 
 ## Usage <a name = "usage"></a>
 
-Pine relies on a configuration file named `config.ini` in the executable's directory. An example is provided below.
+Pine relies on a configuration file named `config.ini` in the current working directory or one specified using `pine <path to config.ini>`. An example `config.ini` is provided below.
 
 ```
 [config]
