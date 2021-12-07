@@ -3,8 +3,15 @@ mod config;
 mod logging;
 mod server;
 
-use crate::logging::{debug, error, info};
+use crate::logging::{debug, error, info, startup};
 use std::path::Path;
+
+const LOGO: &str = r#"                          
+   ___  __ __  ___ 
+  / _ \/ / _ \/ -_)
+ / .__/_/_//_/\__/ 
+/_/
+"#;
 
 // help message
 const HELP: &str = r#"                          
@@ -39,11 +46,17 @@ fn main() {
     let conf = config::getconfig(&args.configfile.unwrap());
 
     // start server
-    info(format!(
-        "server listening on http://localhost:{}",
-        conf.port
-    ));
     debug("running in debug mode");
+    startup("", LOGO);
+    startup(
+        "server endpoint at",
+        &format!("http://localhost:{}", conf.port),
+    );
+    for (hosts, to) in &conf.hosts {
+        startup("proxying", &format!("{} -> {}", hosts.join(", "), to));
+    }
+    println!("");
+    info(format!("hit ctrl-c to stop the server"));
     server::run(conf);
 }
 

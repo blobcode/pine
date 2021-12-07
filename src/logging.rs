@@ -5,6 +5,11 @@ fn log(logtype: &str, style: yansi::Style, content: &str) {
     println!("[{}] {}", style.paint(logtype), content);
 }
 
+// special startup log
+pub fn startup(name: &str, input: &str) {
+    println!("{} {}", Style::new(Color::Yellow).paint(&name), &input);
+}
+
 // logs info to screen
 pub fn info(input: String) {
     log("info", Style::new(Color::Cyan), &input)
