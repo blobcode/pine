@@ -9,3 +9,4 @@ tokio = { version = "1", features = ["full"] }
 pico-args = "0.4.2"
 yansi = "0.5"
 tini = "1.1"
+chrono = "0.4"

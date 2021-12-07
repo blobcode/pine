@@ -4,6 +4,7 @@ use std::net::SocketAddr;
 
 use crate::config::Config;
 use crate::logging::{error, info};
+use chrono::prelude::*;
 
 // main event loop
 #[tokio::main]
@@ -34,7 +35,8 @@ pub async fn run(config: Config) {
                         if fromhost == &headers["host"] {
                             toaddr = to;
                             info(format!(
-                                "request to {}{} sent to {}",
+                                "[{}] request to {}{} -> {}",
+                                Utc::now(),
                                 fromhost,
                                 req.uri(),
                                 to,
