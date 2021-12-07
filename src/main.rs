@@ -3,10 +3,10 @@ mod config;
 mod logging;
 mod server;
 
+use crate::logging::{debug, error, info};
 use std::path::Path;
 
-use crate::logging::{debug, error, info};
-
+// help message
 const HELP: &str = r#"                          
    ___  __ __  ___ 
   / _ \/ / _ \/ -_)
@@ -21,6 +21,7 @@ pine <config file>
 
 "#;
 
+// main app args
 #[derive(Debug)]
 struct AppArgs {
     configfile: Option<String>,
@@ -37,6 +38,7 @@ fn main() {
 
     let conf = config::getconfig(&args.configfile.unwrap());
 
+    // start server
     info(format!(
         "server listening on http://localhost:{}",
         conf.port
@@ -46,9 +48,10 @@ fn main() {
 }
 
 fn parse_args() -> Result<AppArgs, pico_args::Error> {
+    // init config struct
     let mut pargs = pico_args::Arguments::from_env();
 
-    // Help has a higher priority and should be handled separately.
+    // Help has a higher priority and should be handled first.
     if pargs.contains(["-h", "--help"]) {
         print!("{}", HELP);
         std::process::exit(0);
@@ -58,7 +61,6 @@ fn parse_args() -> Result<AppArgs, pico_args::Error> {
         configfile: pargs.opt_free_from_str()?,
     };
 
-    // overwrite args if local config.ini file is found in the cwd
     if Path::new("./config.ini").exists() && args.configfile.is_none() {
         args.configfile = Some("./config.ini".to_string())
     }

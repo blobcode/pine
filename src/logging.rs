@@ -11,7 +11,7 @@ pub fn info(input: String) {
 }
 
 pub fn error(input: &str) {
-        log("error", Style::new(Color::Red), &input)
+    log("error", Style::new(Color::Red), input)
 }
 
 // only compiles on debug builds, not in --release

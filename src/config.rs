@@ -8,10 +8,12 @@ pub struct Config {
     pub hosts: HashMap<Vec<String>, String>,
 }
 
+// loads file
 fn readfile(file: &str) -> Ini {
     Ini::from_file(file).unwrap()
 }
 
+// parse config file
 fn gethosts(file: &str) -> HashMap<Vec<String>, String> {
     let config = readfile(file);
     let hostlist: Vec<String> = config.get_vec("config", "hosts").unwrap();
@@ -25,7 +27,7 @@ fn gethosts(file: &str) -> HashMap<Vec<String>, String> {
     hosts
 }
 
-// main function
+// main function to get config struct
 pub fn getconfig(file: &str) -> Config {
     let conf = readfile(file);
     Config {
