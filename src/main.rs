@@ -36,8 +36,9 @@ fn main() {
         format!("http://localhost:{}", conf.port),
     );
     for (host, to) in &conf.hosts {
-        println!("proxying {}", format!("{} -> {}", host, to));
+        println!("proxying {} -> {}", host, to);
     }
+    println!();
     info!("hit ctrl-c to stop the server");
 
     server::run(conf);

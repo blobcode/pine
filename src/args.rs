@@ -27,7 +27,7 @@ pub fn parse() -> Result<AppArgs, pico_args::Error> {
 
     // Help has a higher priority and should be handled first.
     if pargs.contains(["-h", "--help"]) {
-        print!("{}", HELP);
+        println!("{}", HELP);
         std::process::exit(0);
     }
 

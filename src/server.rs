@@ -31,7 +31,8 @@ pub async fn run(config: Config) {
                 for (host, to) in &hosts {
                     if host == &headers["host"] {
                         toaddr = to;
-                        info!("request to {}{} -> {}", host, req.uri(), to)
+                        // log request
+                        info!("request to {}{} -> {}{}", host, req.uri(), to, req.uri())
                     }
                 }
                 // format new uri
