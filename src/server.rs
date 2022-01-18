@@ -28,12 +28,10 @@ pub async fn run(config: Config) {
                 let mut toaddr = " ";
                 let headers = req.headers();
                 // check for host matches in the config file
-                for (hostgroup, to) in &hosts {
-                    for fromhost in hostgroup {
-                        if fromhost == &headers["host"] {
-                            toaddr = to;
-                            info!("request to {}{} -> {}", fromhost, req.uri(), to)
-                        }
+                for (host, to) in &hosts {
+                    if host == &headers["host"] {
+                        toaddr = to;
+                        info!("request to {}{} -> {}", host, req.uri(), to)
                     }
                 }
                 // format new uri

@@ -35,8 +35,8 @@ fn main() {
         "server endpoint at {}",
         format!("http://localhost:{}", conf.port),
     );
-    for (hosts, to) in &conf.hosts {
-        println!("proxying {}", format!("{} -> {}", hosts.join(", "), to));
+    for (host, to) in &conf.hosts {
+        println!("proxying {}", format!("{} -> {}", host, to));
     }
     info!("hit ctrl-c to stop the server");
 
