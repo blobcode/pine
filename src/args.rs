@@ -16,7 +16,6 @@ pine <config file>
 
 "#;
 
-// main app args
 #[derive(Debug)]
 pub struct AppArgs {
     pub configfile: Option<String>,
@@ -32,10 +31,12 @@ pub fn parse() -> Result<AppArgs, pico_args::Error> {
         std::process::exit(0);
     }
 
+    // try to load args
     let mut args = AppArgs {
         configfile: pargs.opt_free_from_str()?,
     };
 
+    // file checking
     if Path::new("./config.ini").exists() && args.configfile.is_none() {
         args.configfile = Some("./config.ini".to_string())
     }

@@ -17,6 +17,7 @@ fn main() {
     let env = Env::default().filter_or("MY_LOG_LEVEL", "info");
     env_logger::init_from_env(env);
 
+    // parse args
     let args = match args::parse() {
         Ok(v) => v,
         Err(e) => {
@@ -25,6 +26,7 @@ fn main() {
         }
     };
 
+    // load config
     let conf = config::getconfig(&args.configfile.unwrap());
 
     // start server
@@ -37,5 +39,6 @@ fn main() {
         println!("proxying {}", format!("{} -> {}", hosts.join(", "), to));
     }
     info!("hit ctrl-c to stop the server");
+
     server::run(conf);
 }
