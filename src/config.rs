@@ -33,7 +33,7 @@ fn gethosts(file: &str) -> HashMap<String, String> {
 }
 
 // main function to get config struct
-pub fn getconfig(file: &str) -> Config {
+pub fn parse(file: &str) -> Config {
     // load file
     let conf = readfile(file);
     // create config struct

@@ -27,7 +27,7 @@ fn main() {
     };
 
     // load config
-    let conf = config::getconfig(&args.configfile.unwrap());
+    let conf = config::parse(&args.configfile.unwrap());
 
     // start server
     println!("{}", LOGO);
