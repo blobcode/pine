@@ -13,11 +13,10 @@ pub async fn run(config: Config) {
     let hosts = config.hosts;
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
 
+    // init client
     let client_main = Client::new();
 
-    // The closure inside `make_service_fn` is run for each connection,
-    // creating a 'service' to handle requests for that specific connection, and
-    // will run on EVERY request.
+    // main server function
     let make_service = make_service_fn(move |_| {
         // clone vars
         let hosts = hosts.clone();
@@ -53,6 +52,7 @@ pub async fn run(config: Config) {
             }))
         }
     });
+
     // start server
     let server = Server::bind(&addr).serve(make_service);
     // error handling
