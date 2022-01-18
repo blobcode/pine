@@ -1,10 +1,9 @@
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Client, Error, Server};
+use log::{error, info};
 use std::net::SocketAddr;
 
 use crate::config::Config;
-use crate::logging::{error, info};
-use chrono::prelude::*;
 
 // main event loop
 #[tokio::main]
@@ -34,13 +33,7 @@ pub async fn run(config: Config) {
                     for fromhost in hostgroup {
                         if fromhost == &headers["host"] {
                             toaddr = to;
-                            info(format!(
-                                "[{}] request to {}{} -> {}",
-                                Utc::now(),
-                                fromhost,
-                                req.uri(),
-                                to,
-                            ))
+                            info!("request to {}{} -> {}", fromhost, req.uri(), to)
                         }
                     }
                 }
@@ -63,7 +56,7 @@ pub async fn run(config: Config) {
     // start server
     let server = Server::bind(&addr).serve(make_service);
     // error handling
-    if let Err(err) = server.await {
-        error(&format!("{}", err));
+    if let Err(e) = server.await {
+        error!("{}", e);
     }
 }

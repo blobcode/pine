@@ -1,10 +1,10 @@
-// imports
-mod config;
-mod logging;
-mod server;
-
-use crate::logging::{debug, error, info, startup};
+use env_logger::Env;
+use log::{error, info};
 use std::path::Path;
+
+// global modules
+mod config;
+mod server;
 
 const LOGO: &str = r#"                          
    ___  __ __  ___ 
@@ -35,6 +35,10 @@ struct AppArgs {
 }
 
 fn main() {
+    // logging level setup
+    let env = Env::default().filter_or("MY_LOG_LEVEL", "info");
+    env_logger::init_from_env(env);
+
     let args = match parse_args() {
         Ok(v) => v,
         Err(e) => {
@@ -46,17 +50,15 @@ fn main() {
     let conf = config::getconfig(&args.configfile.unwrap());
 
     // start server
-    debug("running in debug mode");
-    startup("", LOGO);
-    startup(
-        "server endpoint at",
-        &format!("http://localhost:{}", conf.port),
+    println!("{}", LOGO);
+    println!(
+        "server endpoint at {}",
+        format!("http://localhost:{}", conf.port),
     );
     for (hosts, to) in &conf.hosts {
-        startup("proxying", &format!("{} -> {}", hosts.join(", "), to));
+        println!("proxying {}", format!("{} -> {}", hosts.join(", "), to));
     }
-    println!("");
-    info(format!("hit ctrl-c to stop the server"));
+    info!("hit ctrl-c to stop the server");
     server::run(conf);
 }
 
@@ -79,8 +81,8 @@ fn parse_args() -> Result<AppArgs, pico_args::Error> {
     }
     // checking if the config file doesn't exist
     else if !Path::new(&args.configfile.clone().unwrap()).exists() {
-        error(&format!("{} not found", args.configfile.unwrap()));
-        print!("{}", HELP);
+        error!("{} not found", args.configfile.unwrap());
+        println!("{}", HELP);
         std::process::exit(0);
     }
 
