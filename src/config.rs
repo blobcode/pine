@@ -1,5 +1,4 @@
-extern crate tini;
-use std::collections::HashMap;
+use hashbrown::HashMap;
 use tini::Ini;
 
 // main config struct
