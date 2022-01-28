@@ -28,7 +28,6 @@ fn gethosts(file: &str) -> HashMap<String, String> {
             hosts.insert(from.to_string(), to);
         }
     }
-    println!("{:#?}", hosts);
     hosts
 }
 
