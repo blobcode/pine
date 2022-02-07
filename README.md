@@ -41,10 +41,9 @@ port = 8080
 [[host]]
 from = ["localhost:8080", "example.com"]
 to = "localhost:4000"
-
 ```
 
-Let's take a look at `[[host]]`. It represents internal http services you want forwarded externally. In our case, it denotes that we should forward all requests looking for `localhost:8080` or `example.com` to `localhost:4000`.
+Let's take a look at `[[host]]`. It represents an internal http service you want forwarded externally. In our case, it denotes that we should forward all requests looking for `localhost:8080` or `example.com` to `localhost:4000`.
 
 ### Load Balancing
 If you want to include load balancing, take a look at another project of mine, [scarf](https://github.com/blobcode/scarf), a super simple tcp load balancer written in rust.
