@@ -6,7 +6,7 @@
 
 ## About <a name = "about"></a>
 
-Pine is a simple rust-based reverse proxy built on top of hyper.
+Pine is a simple rust-based reverse proxy built on top of hyper that supports multiple hosts and has super simple configuration!
 ## Installing
 
 To install, clone this git repo and `cd` into it
