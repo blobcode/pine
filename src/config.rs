@@ -1,31 +1,46 @@
-use hashbrown::HashMap;
-use tini::Ini;
+use serde::Deserialize;
+use std::{collections::HashMap, fs};
 
 // main config struct
+
 pub struct Config {
     pub port: u16,
     pub hosts: HashMap<String, String>,
 }
 
+// structs that parse toml
+#[derive(Deserialize)]
+pub struct ConfigToml {
+    pub port: u16,
+    pub host: Vec<HostToml>,
+}
+
+#[derive(Deserialize)]
+pub struct HostToml {
+    pub from: Vec<String>,
+    pub to: String,
+}
+
 // loads file
-fn readfile(file: &str) -> Ini {
-    Ini::from_file(file).unwrap()
+fn readfile(file: &str) -> ConfigToml {
+    // read file
+    let buf = fs::read_to_string(file).unwrap();
+
+    // parse file contents
+    toml::from_str(&buf).unwrap()
 }
 
 // parse config file
 fn gethosts(file: &str) -> HashMap<String, String> {
-    // load config file
+    // load config
     let config = readfile(file);
     // parse list
-    let hostlist: Vec<String> = config.get_vec("config", "hosts").unwrap();
     let mut hosts = HashMap::new();
-
     // add all "to" and "from" fields to the hashmap
-    for host in hostlist {
-        let input: String = config.get(&host, "from").unwrap();
-        for from in input.split(", ") {
-            let to: String = config.get(&host, "to").unwrap();
-            hosts.insert(from.to_string(), to);
+    for host in config.host {
+        for from in host.from {
+            let to = &host.to;
+            hosts.insert(from.to_string(), to.to_string());
         }
     }
     hosts
@@ -33,11 +48,11 @@ fn gethosts(file: &str) -> HashMap<String, String> {
 
 // main function to get config struct
 pub fn parse(file: &str) -> Config {
-    // load file
-    let conf = readfile(file);
+    // load
+    let config = readfile(file);
     // create config struct
     Config {
-        port: conf.get("config", "port").unwrap(),
+        port: config.port,
         hosts: gethosts(file),
     }
 }

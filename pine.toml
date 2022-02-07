@@ -1,0 +1,7 @@
+# port to serve on
+port = 8080
+
+# example host that proxies localhost:8080 and example.com -> localhost:4000 
+[[host]]
+from = ["localhost:8080", "example.com"]
+to = "localhost:4000"

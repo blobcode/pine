@@ -37,8 +37,8 @@ pub fn parse() -> Result<AppArgs, pico_args::Error> {
     };
 
     // file checking
-    if Path::new("./config.ini").exists() && args.configfile.is_none() {
-        args.configfile = Some("./config.ini".to_string())
+    if Path::new("./pine.toml").exists() && args.configfile.is_none() {
+        args.configfile = Some("./pine.toml".to_string())
     }
     // checking if the config file doesn't exist
     else if !Path::new(&args.configfile.clone().unwrap()).exists() {

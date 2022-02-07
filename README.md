@@ -33,25 +33,18 @@ cargo run --release
 
 ## Usage <a name = "usage"></a>
 
-Pine relies on a configuration file named `config.ini` in the current working directory or one specified using `pine <path to config.ini>`. An example `config.ini` is provided below.
+Pine relies on a configuration file named `pine.toml` in the current working directory or one specified using `pine <path to pine.toml>`. An example `pine.toml` is provided below.
 
 ```
-[config]
-port = 3000
-hosts = a, b
+port = 8080
 
-[a]
-from = a.com, b.com
-to = localhost:4000
+[[host]]
+from = ["localhost:8080", "example.com"]
+to = "localhost:4000"
 
-[b]
-from = c.com
-to = localhost:5000
 ```
 
-Here we can see the `[config]` header contains `port` and `hosts`. Port is the local port it will run on, and hosts is a list of the headers of all hosts you want served from the ones below.
-
-Now let's take a look at `[a]` and `[b]`. They represent internal http services you want forwarded externally. In `[a]`'s case, it denotes that we should forward all requests looking for `a.com` or `b.com` to `localhost:4000`.
+Let's take a look at `[[host]]`. It represents internal http services you want forwarded externally. In our case, it denotes that we should forward all requests looking for `localhost:8080` or `example.com` to `localhost:4000`.
 
 ### Load Balancing
-If you want to include load balancing, take a look at another project of mine, [scarf](https://github.com/blobcode/scarf), a super simple load balancer written in rust.
+If you want to include load balancing, take a look at another project of mine, [scarf](https://github.com/blobcode/scarf), a super simple tcp load balancer written in rust.
