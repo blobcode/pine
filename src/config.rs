@@ -2,7 +2,6 @@ use serde::Deserialize;
 use std::{collections::HashMap, fs};
 
 // main config struct
-
 pub struct Config {
     pub port: u16,
     pub hosts: HashMap<String, String>,
@@ -23,7 +22,7 @@ pub struct HostToml {
 
 // loads file
 fn readfile(file: &str) -> ConfigToml {
-    // read file
+    // read file (infailable)
     let buf = fs::read_to_string(file).unwrap();
 
     // parse file contents
@@ -31,7 +30,7 @@ fn readfile(file: &str) -> ConfigToml {
 }
 
 // parse config file
-fn gethosts(file: &str) -> HashMap<String, String> {
+fn parsehosts(file: &str) -> HashMap<String, String> {
     // load config
     let config = readfile(file);
     // parse list
@@ -48,11 +47,11 @@ fn gethosts(file: &str) -> HashMap<String, String> {
 
 // main function to get config struct
 pub fn parse(file: &str) -> Config {
-    // load
+    // load config
     let config = readfile(file);
-    // create config struct
+    // create main config struct
     Config {
         port: config.port,
-        hosts: gethosts(file),
+        hosts: parsehosts(file),
     }
 }

@@ -32,7 +32,13 @@ pub async fn run(config: Config) {
                     if host == &headers["host"] {
                         toaddr = to;
                         // log request
-                        info!("request to {}{} -> {}{}", host, req.uri(), to, req.uri())
+                        info!(
+                            "proxied request from {}{} -> {}{}",
+                            host,
+                            req.uri(),
+                            to,
+                            req.uri()
+                        )
                     }
                 }
                 // format new uri
@@ -53,7 +59,11 @@ pub async fn run(config: Config) {
     });
 
     // start server
+    info!("server started");
+
+    // bind to address
     let server = Server::bind(&addr).serve(make_service);
+
     // error handling
     if let Err(e) = server.await {
         error!("{}", e);

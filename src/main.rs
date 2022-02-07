@@ -21,7 +21,7 @@ fn main() {
     let args = match args::parse() {
         Ok(v) => v,
         Err(e) => {
-            error!("Error: {}.", e);
+            error!("{}", e);
             std::process::exit(1);
         }
     };

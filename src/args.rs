@@ -16,7 +16,6 @@ pine <config file>
 
 "#;
 
-#[derive(Debug)]
 pub struct AppArgs {
     pub configfile: Option<String>,
 }
