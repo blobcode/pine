@@ -1,8 +1,8 @@
 # 🌲 pine
 
 - [About](#about)
-- [Development](#development)
 - [Installing](#installing)
+- [Development](#development)
 - [Usage](#usage)
 
 ## About <a name = "about"></a>
