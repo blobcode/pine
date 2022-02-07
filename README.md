@@ -1,15 +1,28 @@
 # 🌲 pine
 
 - [About](#about)
-- [Getting Started](#getting_started)
+- [Development](#development)
+- [Installing](#installing)
 - [Usage](#usage)
 
 ## About <a name = "about"></a>
 
 Pine is a simple rust-based reverse proxy built on top of hyper that supports multiple hosts and has super simple configuration!
-## Installing
+## Installing <a name = "installing"></a>
 
-To install, clone this git repo and `cd` into it
+To install the current version normally, run
+```
+cargo install --git https://github.com/blobcode/pine
+```
+
+This assumes that you have both cargo and git installed.
+
+For next steps, take a look in [usage](#usage).
+
+
+## Development <a name = "development"></a>
+
+To install for development, clone this git repo and `cd` into it
 
 ```
 git clone https://github.com/blobcode/pine
@@ -30,6 +43,7 @@ For best performance, run using the release flag enabled.
 ```
 cargo run --release
 ```
+
 
 ## Usage <a name = "usage"></a>
 
