@@ -8,6 +8,9 @@
 ## About <a name = "about"></a>
 
 Pine is a simple rust-based reverse proxy built on top of hyper that supports multiple hosts and has super simple configuration!
+
+Please note that this should probably not be used in favor of [cobalt](https://github.com/blobcode/cobalt), which is a better solution on many different levels.
+
 ## Installing <a name = "installing"></a>
 
 To install the current version normally, run
